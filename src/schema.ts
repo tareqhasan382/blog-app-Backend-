@@ -10,7 +10,10 @@ type Mutation {
 
   login(email:String!,password:String!):AuthPayload,
 
-  addPost(title:String!,content:String!):PostPayload
+  addPost(post:PostInput!):PostPayload,
+  updatePost(postId:ID!,post:PostInput!):PostPayload,
+  deletePost(postId:ID!):PostPayload,
+
 }
 
   type Post {
@@ -49,6 +52,10 @@ type Mutation {
           type PostPayload {
             userError:String
             post:Post
+          }
+          input PostInput {
+            title:String
+            content:String
           }
 
 `;
