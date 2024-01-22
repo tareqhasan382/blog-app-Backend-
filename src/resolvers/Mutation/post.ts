@@ -1,4 +1,3 @@
-import { error } from "console";
 import { checkUserAccess } from "../../utils/checkUserAccess";
 
 export const postResolvers = {
@@ -42,28 +41,22 @@ export const postResolvers = {
         post: null,
       };
     }
-    const user = await prisma.user.findUnique({
-      where: { id: userInfo },
-    });
+    const checkUser = await checkUserAccess({ prisma, userInfo, postId });
 
-    if (!user) {
+    if (checkUser.userError) {
       return {
-        userError: "user not found",
-        post: null,
+        userError: checkUser.userError,
       };
     }
-    const existPost = await prisma.post.findUnique({
-      where: { id: postId },
-    });
-    // console.log("data:", existPost);
-    if (!existPost) {
+
+    if (checkUser.existPost.authorId !== checkUser.user.id) {
       return {
-        userError: "Post not found",
+        userError: "Post not owned by user",
         post: null,
       };
     }
 
-    if (existPost.authorId !== user.id) {
+    if (checkUser.existPost.authorId !== checkUser.user.id) {
       return {
         userError: "Post not owned by user",
         post: null,
@@ -117,5 +110,53 @@ export const postResolvers = {
       post: result,
     };
     // console.log("result:", result);
+  },
+  publishedPost: async (
+    parent: any,
+    { postId, post }: any,
+    { prisma, userInfo }: any
+  ) => {
+    // console.log("data:", post, "postId:", postId, "userInfo:", userInfo);
+    if (!userInfo) {
+      return {
+        userError: "unauthorized",
+        post: null,
+      };
+    }
+    const checkUser = await checkUserAccess({ prisma, userInfo, postId });
+
+    if (checkUser.userError) {
+      return {
+        userError: checkUser.userError,
+      };
+    }
+
+    if (checkUser.existPost.authorId !== checkUser.user.id) {
+      return {
+        userError: "Post not owned by user",
+        post: null,
+      };
+    }
+
+    if (checkUser.existPost.authorId !== checkUser.user.id) {
+      return {
+        userError: "Post not owned by user",
+        post: null,
+      };
+    }
+
+    const result = await prisma.post.update({
+      where: {
+        id: postId,
+      },
+      data: {
+        publish: true,
+      },
+    });
+    // console.log("result:", result);
+    return {
+      userError: null,
+      post: result,
+    };
   },
 };

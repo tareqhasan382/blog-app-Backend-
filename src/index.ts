@@ -5,7 +5,7 @@ import { resolvers } from "./resolvers";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 import { getUserInfoFromToken } from "./utils/jwtHelpers";
-const prisma = new PrismaClient();
+export const prisma = new PrismaClient();
 interface Context {
   prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>;
   userInfo: string | null;

@@ -4,6 +4,8 @@ type Query{
   me:User
   users:[User]
   posts:[Post]
+  profile(userId:ID!):Profile # public route api
+  # profile:Profile 
 }
 type Mutation {
   signup(name:String!,email:String!,password:String!,bio:String):UserSignup,
@@ -13,6 +15,7 @@ type Mutation {
   addPost(post:PostInput!):PostPayload,
   updatePost(postId:ID!,post:PostInput!):PostPayload,
   deletePost(postId:ID!):PostPayload,
+  publishedPost(postId:ID!):PostPayload
 
 }
 
